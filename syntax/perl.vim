@@ -6,7 +6,13 @@ if version < 600
   syn include @javascriptTop <sfile>:p:h/javascript.vim
 else
   syn include @javascriptTop syntax/javascript.vim
-  syn include @sqlTop syntax/sql.vim
-  runtime! syntax/html.vim
   unlet b:current_syntax
+
+  syn include @sqlTop syntax/sql.vim
+  unlet b:current_syntax
+
+  syn include @htmlTop syntax/html.vim
+  "runtime! syntax/html.vim
+  unlet b:current_syntax
+
 endif

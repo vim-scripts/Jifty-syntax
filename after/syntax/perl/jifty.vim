@@ -13,6 +13,11 @@
 "     runtime! syntax/jifty.vim
 " endif
 
+let jifty_fold_schema = 1
+let jifty_fold_schema_column = 1
+let jifty_fold_template = 1
+let jifty_fold_tags  = 1
+
 syn keyword     jfmethods  current_user_can before_create after_create take_action
 
 " template declare
@@ -25,9 +30,6 @@ syn keyword     jftdfunction      clear_state_variables get_region region replac
 
 syn cluster     jifty             contains=jftdtag,jftdfunction
 
-" let template and div fold
-"syn region      jfprivtemplate        start=+^private\s\+template+ end=+^};+ transparent fold
-syn region      jftemplate        start=+^\(private\s\+\)\=template+ end=+^};+ transparent fold
 
 syn match       jfscolname  "\v((param|column)\_[ \n]*)@<=\w+" contained
 syn keyword     jfscol      param column      nextgroup=jfscolname contained
@@ -35,18 +37,39 @@ syn keyword     jfspropertybe     is are      nextgroup=jfsproperty contained
 syn keyword     jfsproperty   type refers_to render_as valid hints default since label immutable mandatory
             \   nextgroup=jfspropis contained
 
-syn region jfscolumn start=+^\s*\(param\|column\)\>+  end=+;+ contained contains=jfspropertybe,jfsproperty,jfscol,jfscolname,
-            \ perlComment,perlString,perlFunction,perlFloat,perlNumber,perlSpecialString,perlStringUnexpanded fold
+if exists("jifty_fold_schema") 
+  syn region jfms start=+schema[ \n]*{+ end=+}[\n ]*;+ contains=jfscolumn,perlComment fold
+else
+  syn region jfms start=+schema[ \n]*{+ end=+}[\n ]*;+ contains=jfscolumn,perlComment
+endif
 
-syn region jfms start=+schema[ \n]*{+ end=+}[\n ]*;+ contains=jfscolumn,perlComment fold
+
+if exists("jifty_fold_schema_column")
+  syn region jfscolumn start=+^\s*\(param\|column\)\>+  end=+;+ contained contains=jfspropertybe,jfsproperty,jfscol,jfscolname,
+            \ perlComment,perlString,perlFunction,perlFloat,perlNumber,perlSpecialString,perlStringUnexpanded 
+            \ fold
+else
+  syn region jfscolumn start=+^\s*\(param\|column\)\>+  end=+;+ contained contains=jfspropertybe,jfsproperty,jfscol,jfscolname,
+            \ perlComment,perlString,perlFunction,perlFloat,perlNumber,perlSpecialString,perlStringUnexpanded
+endif
+
+" let template and div fold
+if exists("jifty_fold_template")
+  syn region      jftemplate        start=+^\(private\s\+\)\=template+ end=+^};+ transparent fold keepend
+endif
+
+if exists("jifty_fold_tags")
+  syn region      jftags           start="^\z(\s*\)\<\(div\|table\|row\|form\|script\)\>\s*{" end="^\z1};\=" transparent fold keepend
+endif
+
+syn region jfembjs    start=+<<JS\z(.*\)$+     end=+^JS\z1$+    contains=@javascriptTop
+syn region jfembsql   start=+<<SQL\z(.*\)$+    end=+^SQL\z1$+   contains=@sqlTop
+syn region jfembhtml  start=+<<HTML\z(.*\)$+   end=+^HTML\z1$+  contains=@htmlTop
 
 hi link jfscol        perlStatement
 hi link jftdtag       perlStatement
 hi link jftdfunction  perlMethod
 hi link jfmethods     perlMethod
-
 hi link jfscolname    perlType
 hi link jfspropertybe perlIdentifier
 hi link jfsproperty   perlIdentifier
-
-

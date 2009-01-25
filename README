@@ -1,0 +1,43 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2523
+
+syntax support of jifty web framework ( http://search.cpan.org/~sartak/Jifty-0.80408/ )
+
+  * template syntax , folding
+  * model / action schema syntax , folding
+  * schema keywords
+  * functions keywords
+  * syntax highlight for sql, js , html embedded hereDoc
+
+to turn on the syntax folding to fold template and schema columns:
+
+  set fdm=syntax
+
+options: you can choose what you want to fold, append following lines to your .vimrc
+
+   let jifty_fold_schema = 1
+   let jifty_fold_schema_column = 1
+   let jifty_fold_template = 1
+   let jifty_fold_tags = 1
+   let jifty_fold_dispatcher = 1
+
+Supports sql,javascript,html embedded hereDoc string:
+  you can add prefix to the identifier like SQL.. , HTML... , JS...
+  e.g.
+
+  $sql =<<SQL123
+    select * from books
+SQL123
+  
+  or 
+
+  $html =<<HTML123
+  <html>
+      <h1>Jifty</h1>
+  </html>
+HTML123
+
+
+patches are welcome.  :)
+
+cornelius.howl+vim {at} gmail.com
+

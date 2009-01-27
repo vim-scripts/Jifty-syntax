@@ -1,7 +1,8 @@
 " Vim syntax file
 " Language:	    Perl / Jifty Web Frame Application
 " Maintainer:	  Lin Yo-An  <cornelius.howl+vim@gmail.com> 
-" Last Change:	2009 Jan 25
+" Last Change:	09 Jan 26 01/26/2009
+" Version:      0.22
 "
 " Install:
 " put jifty.vim to ~/.vim/after/syntax/perl/jifty.vim
@@ -9,11 +10,16 @@
 " ===============================
 " if version < 600
 "   so <sfile>:p:h/html.vim
+"   unlet b:current_syntax
 "   syn include @sqlTop     <sfile>:p:h/sql.vim
+"   unlet b:current_syntax
 "   syn include @javascriptTop <sfile>:p:h/javascript.vim
+"   unlet b:current_syntax
 " else
 "   syn include @javascriptTop syntax/javascript.vim
+"   unlet b:current_syntax
 "   syn include @sqlTop syntax/sql.vim
+"   unlet b:current_syntax
 "   runtime! syntax/html.vim
 "   unlet b:current_syntax
 " endif
@@ -36,7 +42,7 @@ syn cluster     jifty             contains=jftdtag,jftdfunction
 syn match       jfscolname  "\v((param|column)\_[ \n]*)@<=\w+" contained
 syn keyword     jfscol      param column      nextgroup=jfscolname contained
 syn keyword     jfspropertybe     is are      nextgroup=jfsproperty contained
-syn keyword     jfsproperty   type refers_to render_as valid hints default since label immutable mandatory
+syn keyword     jfsproperty   type defer refers_to render_as valid hints default since label immutable mandatory
             \   nextgroup=jfspropis contained
 
 if exists("jifty_fold_schema") 
@@ -61,26 +67,27 @@ if exists("jifty_fold_template")
 endif
 
 if exists("jifty_fold_dispatcher")
-  syn region      jfdispatcher        start=+^\(before\|on\)\s\++ end=+^};+ transparent fold
+  syn region      jfdispatcher        start=+^\(before\|on\)\s\++ end=+^};+ transparent fold keepend
 endif
 
 if exists("jifty_fold_tags")
   syn region      jftags           start="^\z(\s*\)\<\(div\|table\|row\|form\|script\)\>\s*{" end="^\z1};\=" transparent fold keepend
 endif
 
-"syn region jfdispatcher  
-" syn region jfembjs    start=+\(<<\)\@<=JS\z(.*\)$+     end=+^JS\z1$+    contains=@javascriptTop
-" syn region jfembsql   start=+\(<<\)\@<=SQL\z(.*\)$+    end=+^SQL\z1$+   contains=@sqlTop
-" syn region jfembhtml  start=+\(<<\)\@<=HTML\z(.*\)$+   end=+^HTML\z1$+  contains=@htmlTop
 
-" FIXME:  we can't use lookforward because the perlHereDoc will match first,
+" FIXME:  we can't use lookforward regexp because the perlHereDoc '<<' will match first,
 " so we create another inner block contained by jfembhtml
-syn region jfembhtmlblock start=+\(<<\)\@<=HTML+  end=+^\(HTML\)\@=+ contained contains=@htmlTop
+syn region jfembhtmlblock start=+\(<<\)\@<=['"]\=\z(HTML\)+  end=+^\(HTML\)\@=+ contained contains=@htmlTop
 
-syn region jfembjs    start=+<<JS\z(.*\)$+     end=+^JS\z1$+    contains=@javascriptTop
-syn region jfembsql   start=+<<SQL\z(.*\)$+    end=+^SQL\z1$+   contains=@sqlTop
-syn region jfembhtml  start=+<<HTML\z(.*\)$+   end=+^HTML\z1$+  contains=jfembhtmlblock
-"syn region jfembhtml  start=+HTML\z(.*\)$+   end=+^HTML\z1$+  contains=@htmlTop
+syn region jfembjs    start=+<<['"]\=\z(JS\S*\)['"]\=+     end=+^\z1$+    contains=@javascriptTop
+syn region jfembsql   start=+<<['"]\=\z(SQL\S*\)['"]\=+    end=+^\z1$+    contains=@sqlTop
+syn region jfembhtml  start=+<<\z(HTML\S*\)+        end=+^\z1$+           contains=jfembhtmlblock
+syn region jfembhtml  start=+<<['"]\z(HTML\S*\)['"]+    end=+^\z1$+       contains=jfembhtmlblock transparent
+
+" Highlight Links
+hi link jfembjs       perlIdentifier
+hi link jfembsql      perlIdentifier
+hi link jfembhtml     perlIdentifier
 
 hi link jfscol        perlStatement
 hi link jftdtag       perlStatement
@@ -89,3 +96,4 @@ hi link jfmethods     perlMethod
 hi link jfscolname    perlType
 hi link jfspropertybe perlIdentifier
 hi link jfsproperty   perlIdentifier
+
